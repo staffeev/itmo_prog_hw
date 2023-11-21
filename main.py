@@ -6,37 +6,45 @@ from datetime import datetime
 
 
 
+def create_test1():
+    c = Category(name="cat1")
+    p = Product(name="prod1", cost=200)
+    p.categories.append(c)
+    session.add(c)
+    session.add(p)
+
+
+def create_test2():
+    p = session.query(Product).first()
+    pc = Purchase(product_id=p.id)
+    pc.product = p
+    session.add(pc)
+
+
+def create_test3():
+    pc = session.query(Purchase).first()
+    print(pc.date, pc.product_id, pc.product)
+
+
+def get_c():
+    return session.query(Category).first()
+
+
+def get_p():
+    return session.query(Product).first()
+
+
+def get_pc():
+    return session.query(Purchase).first()
+
+
+
+
 if __name__ == "__main__":
     db_session.global_init("puchaces.db")
     session = db_session.create_session()
-    pc = session.query(Purchase).first()
-    print(pc.date, pc.product_id, pc.product)
-    # p = session.query(Product).filter(Product.id == 1).first()
-    # c = Category(name="cat1")
-    # p = Product(name="prod1", cost=200)
-    # p.categories.append(c)
-    # session.add(c)
-    # session.add(p)
-
-    # pc = Purchase(product_id=p.id)
-    # pc.product = p
-    # session.add(pc)
-    # print(pc.date)
-    # session.add(pc)
-    # p = session.query(Product).filter(Product.name == "prod1").first()
-    # c = session.query(Category).filter(Category.name == "test1").first()
-    # session.delete(c)
-    # print(p.categories)
-    # c = Category(name="test1")
-    # c2 = Category(name="test2")
-    # c3 = Category(name="test3")
-    # p1 = Product(name="prod1", cost=200)
-    # p2 = Product(name="prod2", cost=300)
-    # p1.categories.append(c)
-    # p1.categories.append(c2)
-    # p2.categories.append(c2)
-    # p2.categories.append(c3)
-    # session.add_all([c, c2, c3])
-    # session.add_all([p1, p2])
+    p = get_p()
+    print(p.purchase.product.categories[0].products)
+    # create_test3()
     session.commit()
     session.close()

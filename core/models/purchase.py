@@ -10,9 +10,8 @@ class Purchase(SqlAlchemyBase):
     id = Column(Integer, primary_key=True, autoincrement=True)
     date = Column(DateTime, default=datetime.datetime.now)
     product_id = Column(Integer, ForeignKey("product.id"), nullable=False)
-    product = relation("Product", uselist=False)
-    # product = relation("Product", secondary="purchase_to_product", back_populates="purchase")
-
+    product = relation("Product", uselist=False, back_populates="purchase",
+                       cascade="all, delete")
 
     def __repr__(self):
         return f"Purchase(date={self.date.strftime('%d-%m-%Y')}, product_id={self.product_id})"
