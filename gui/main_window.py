@@ -7,6 +7,7 @@ from PyQt5.uic import loadUi
 from core.models.purchase import Purchase
 from core.models.product import Product
 from core.models.category import Category
+from gui.form_add_purchase import AddForm
 
 
 def except_hook(cls, exception, traceback):
@@ -32,7 +33,11 @@ class MoneyControlApp(QMainWindow):
     def __init__(self, path_to_db: str):
         super().__init__()
         loadUi("gui/ui/main_window.ui", self)
+        self.setCentralWidget(self.centralwidget)
+        self.setLayout(self.gridLayout)
         db_session.global_init(path_to_db)
+
+        self.btn_add_purchase.clicked.connect(self.exec_add_purchase_form)
         self.show_purchases(self.load_purchases())
     
     @staticmethod
@@ -59,6 +64,12 @@ class MoneyControlApp(QMainWindow):
     def show_purchases(self, purchases: Purchase):
         """Отображает покупки на виджете с таблицей"""
         print(purchases)
+    
+    def exec_add_purchase_form(self, _):
+        """Метод для работы с формой добавления покупки"""
+        form = AddForm()
+        if not form.exec():
+            return
 
 
 

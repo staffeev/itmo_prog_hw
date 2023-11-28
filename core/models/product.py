@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, ForeignKey, String, Table, Float
+from sqlalchemy import Column, Integer, ForeignKey, String, Table, Float, DateTime, Date, Boolean
 from sqlalchemy.orm import relation, validates
 from .db_session import SqlAlchemyBase
+import datetime
 
 
 association_table = Table(
@@ -16,7 +17,9 @@ class Product(SqlAlchemyBase):
     __tablename__ = "product"
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
+    date = Column(Date, default=datetime.datetime.now)
     cost = Column(Float, nullable=False)
+    is_usd = Column(Boolean, default=False)
     categories = relation("Category", secondary="product_to_category", 
                           back_populates="products")
     purchase = relation("Purchase", uselist=False, back_populates="product",
