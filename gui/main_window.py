@@ -4,11 +4,9 @@ sys.path.append(os.getcwd())
 from core.models import db_session
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.uic import loadUi
-from core.models.purchase import Purchase
-from core.models.product import Product
-from core.models.category import Category
 from gui.form_add_purchase import AddForm
-from db.db_control_functions import *
+from db.db_control_functions import get_categories, get_products, add_category, \
+    get_category_by_name, add_purchase
 
 
 def except_hook(cls, exception, traceback):
@@ -24,6 +22,11 @@ class MoneyControlApp(QMainWindow):
         self.setCentralWidget(self.centralwidget)
         self.setLayout(self.gridLayout)
         db_session.global_init(path_to_db)
+        self.session = db_session.create_session()
+        # Объявление нужных переменных
+        self.all_categories = sorted(get_categories(self.session))
+        self.all_purchases = get_products(self.session)
+        # Настройка сигналов и слотов
         self.btn_add_purchase.clicked.connect(self.exec_add_purchase_form)
     
     def exec_add_purchase_form(self, _):
@@ -31,6 +34,28 @@ class MoneyControlApp(QMainWindow):
         form = AddForm()
         if not form.exec():
             return
+        self.process_new_purchase(*form.get_data())
+        
+    def process_new_purchase(self, *args):
+        """Обработка данных о новой покупке"""
+        product_name, cost, currency_is_usd, category_name, date = args
+        date = date.toPyDate()
+        if category_name not in self.all_categories: # новая категория
+            category = add_category(self.session, category_name)
+            self.all_categories.append(category_name)
+            self.all_categories.sort()
+        else:
+            category = get_category_by_name(self.session, category_name)
+        purchase = add_purchase(self.session, product_name, cost, currency_is_usd, date, category)
+
+    
+
+    def closeEvent(self, _):
+        """Ивент закрытия окна"""
+        self.session.close()
+        
+        
+
 
 
 

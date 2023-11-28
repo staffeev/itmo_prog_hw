@@ -71,7 +71,7 @@
       <item row="4" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QRadioButton" name="radioButton">
+         <widget class="QRadioButton" name="radio_rouble">
           <property name="text">
            <string>рубли</string>
           </property>
@@ -81,7 +81,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="radioButton_2">
+         <widget class="QRadioButton" name="radio_usd">
           <property name="text">
            <string>доллары</string>
           </property>

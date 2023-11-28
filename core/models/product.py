@@ -22,8 +22,6 @@ class Product(SqlAlchemyBase):
     is_usd = Column(Boolean, default=False)
     categories = relation("Category", secondary="product_to_category", 
                           back_populates="products")
-    purchase = relation("Purchase", uselist=False, back_populates="product",
-                        cascade="all, delete")
 
     @validates("name")
     def validate_name(self, _, value):
