@@ -1,6 +1,12 @@
-from sqlalchemy import Column, Integer, ForeignKey, String
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relation, validates
 from .db_session import SqlAlchemyBase
+from random import randint
+
+
+def get_random_color():
+    """Возвращает случайный цвет для категории"""
+    return "#%02X%02X%02X" % (randint(0, 255), randint(0, 255), randint(0, 255))
 
 
 class Category(SqlAlchemyBase):
@@ -8,8 +14,10 @@ class Category(SqlAlchemyBase):
     __tablename__ = "category"
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False, unique=True)
+    color = Column(String, nullable=False, default=get_random_color)
     products = relation("Product", secondary="product_to_category", 
                         back_populates="categories", cascade="all, delete")
+
 
     @validates("name")
     def validate_name(self, _, value):
@@ -23,7 +31,7 @@ class Category(SqlAlchemyBase):
         return f"Category(name={self.name})"
     
     def __str__(self):
-        return repr(self)
+        return self.name
 
 
 
