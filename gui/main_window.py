@@ -2,7 +2,8 @@ import sys
 import os
 sys.path.append(os.getcwd())
 from core.models import db_session
-from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QAbstractItemView, QHeaderView
+from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QAbstractItemView, \
+    QHeaderView, QComboBox
 from PyQt5.uic import loadUi
 from gui.form_add_purchase import AddForm
 from db.db_control_functions import get_categories, get_products, add_category, \
@@ -34,6 +35,7 @@ class MoneyControlApp(QMainWindow):
         self.sorting_combobox.currentTextChanged.connect(self.load_all_purchases)
         self.category_combobox.currentTextChanged.connect(self.update_shown_purchases)
         self.reset_btn.clicked.connect(self.reset_filters)
+        self.category_combobox.setInsertPolicy(QComboBox.NoInsert)
 
         # Вызов предварительных функций
         self.load_all_categories()

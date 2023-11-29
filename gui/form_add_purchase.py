@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QMessageBox
+from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QMessageBox, QComboBox
+from PyQt5.QtCore import QDateTime
 from PyQt5.uic import loadUi
 
 
@@ -9,6 +10,8 @@ class AddForm(QDialog):
         loadUi("gui/ui/add_purchase_form.ui", self)
         self.setLayout(self.gridLayout)
         self.category_choice.addItems(sorted(map(str, categories)))
+        self.category_choice.setInsertPolicy(QComboBox.NoInsert)
+        self.calendar.setDateTime(QDateTime.currentDateTime())
         self.buttonBox = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel
         )
