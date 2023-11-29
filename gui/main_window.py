@@ -5,6 +5,7 @@ from core.models import db_session
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QAbstractItemView, \
     QHeaderView, QComboBox
 from PyQt5.uic import loadUi
+from PyQt5.QtGui import QColor
 from gui.form_add_purchase import AddForm
 from db.db_control_functions import get_categories, get_products, add_category, \
     get_category_by_name, add_purchase
@@ -76,7 +77,7 @@ class MoneyControlApp(QMainWindow):
         self.category_combobox.clear()
         self.category_combobox.addItems([""] + sorted(map(str, self.all_categories)))
     
-    def update_shown_purchases(self, purchases):
+    def update_shown_purchases(self):
         """Обновляет список показываемых покупок"""
         self.shown_purchases = self.get_filtered_purchases_by_category(
             self.get_filtered_purchases_by_period(self.all_purchases))
@@ -92,6 +93,7 @@ class MoneyControlApp(QMainWindow):
             self.purchase_list.setItem(i, 1, QTableWidgetItem(purchase.name))
             self.purchase_list.setItem(i, 2, QTableWidgetItem(str(purchase.cost)))
             self.purchase_list.setItem(i, 3, QTableWidgetItem(str(purchase.categories[0])))
+            self.purchase_list.item(i, 3).setBackground(QColor(purchase.categories[0].color))
     
     def get_sorted_purchases(self):
         """Возвращает покупки, отсортированные по ключу из меню"""
@@ -114,7 +116,7 @@ class MoneyControlApp(QMainWindow):
         
     def process_new_purchase(self, *args):
         """Обработка данных о новой покупке"""
-        product_name, cost, currency_is_usd, category_name, date = args
+        product_name, cost, category_name, date = args
         date = date.toPyDateTime()
         if category_name not in list(map(str, self.all_categories)): # новая категория
             category = add_category(self.session, category_name)
@@ -122,7 +124,7 @@ class MoneyControlApp(QMainWindow):
             self.load_all_categories()
         else:
             category = get_category_by_name(self.session, category_name)
-        purchase = add_purchase(self.session, product_name, cost, currency_is_usd, date, category)
+        purchase = add_purchase(self.session, product_name, cost, date, category)
         self.all_purchases.append(purchase)
         self.update_shown_purchases()
     

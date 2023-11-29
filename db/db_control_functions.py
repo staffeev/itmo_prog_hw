@@ -31,10 +31,9 @@ def get_category_by_name(session, category_name: str) -> Category:
     return category
 
 
-def add_purchase(session, product_name: str, cost: float, is_usd: bool, 
-                 date: dt.date, category: Category) -> Product:
+def add_purchase(session, product_name: str, cost: float, date: dt.date, category: Category) -> Product:
     """Добавление новой покупки"""
-    product = Product(name=product_name, cost=cost, is_usd=is_usd, date=date)
+    product = Product(name=product_name, cost=cost, date=date)
     product.categories.append(category)
     session.add(product)
     session.commit()

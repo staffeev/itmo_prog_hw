@@ -24,9 +24,8 @@ class AddForm(QDialog):
         product_name = self.product_name.text()
         cost = self.cost_spinbox.value()
         category_name = self.category_choice.currentText()
-        currency_is_usd = self.radio_usd.isChecked()
         date = self.calendar.dateTime()
-        return product_name, cost, currency_is_usd, category_name, date
+        return product_name, cost, category_name, date
     
     def accept(self):
         """Проверка корректности введенных данных"""
