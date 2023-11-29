@@ -1,9 +1,8 @@
 import sys
 import os
 sys.path.append(os.getcwd())
-from core.models import db_session
-from core.models.product import Product
-from core.models.category import Category
+from models.product import Product
+from models.category import Category
 import datetime as dt
 
 

@@ -1,7 +1,7 @@
 import sys
 import os
 sys.path.append(os.getcwd())
-from core.models import db_session
+from models import db_session
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QAbstractItemView, \
     QHeaderView, QComboBox, QMenu, QMessageBox
 from PyQt5 import QtCore
@@ -210,6 +210,8 @@ class MoneyControlApp(QMainWindow):
 def run_app(path_to_db: str):
     """Запуск программы"""
     app = QApplication(sys.argv)
+    app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+    app.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
     qdarktheme.setup_theme("dark")
     programm = MoneyControlApp(path_to_db)
     programm.show()
