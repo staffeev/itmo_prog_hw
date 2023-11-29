@@ -83,7 +83,7 @@ class MoneyControlApp(QMainWindow):
         category_name = self.category_combobox.currentText()
         if not category_name: # все категории
             return purchases
-        return [i for i in purchases if i.categories[0].name == category_name]
+        return [i for i in purchases if i.category.name == category_name]
 
     def load_all_categories(self):
         """Загрузка категорий в меню"""
@@ -111,8 +111,8 @@ class MoneyControlApp(QMainWindow):
             self.purchase_list.setItem(i, 0, QTableWidgetItem(purchase.date.strftime("%d-%m-%Y %H:%M")))
             self.purchase_list.setItem(i, 1, QTableWidgetItem(purchase.name))
             self.purchase_list.setItem(i, 2, QTableWidgetItem(str(purchase.cost)))
-            self.purchase_list.setItem(i, 3, QTableWidgetItem(str(purchase.categories[0])))
-            self.purchase_list.item(i, 3).setBackground(QColor(purchase.categories[0].color))
+            self.purchase_list.setItem(i, 3, QTableWidgetItem(str(purchase.category)))
+            self.purchase_list.item(i, 3).setBackground(QColor(purchase.category.color))
     
     def get_sorted_purchases(self):
         """Возвращает покупки, отсортированные по ключу из меню"""
@@ -136,6 +136,7 @@ class MoneyControlApp(QMainWindow):
     def process_new_purchase(self, *args):
         """Обработка данных о новой покупке"""
         product_name, cost, category_name, date = args
+        print(args)
         date = date.toPyDateTime()
         if category_name not in list(map(str, self.all_categories)): # новая категория
             category = add_category(self.session, category_name)
@@ -156,7 +157,6 @@ class MoneyControlApp(QMainWindow):
             return
         delete_purcahses(self.session, [self.shown_purchases[i].id for i in rows])
         self.reload_all_purchases()
-    
 
     def closeEvent(self, _):
         """Ивент закрытия окна"""
@@ -170,11 +170,6 @@ class MoneyControlApp(QMainWindow):
         if rows:
             menu.addAction("Удалить записи", lambda: self.delete_from_table(rows))
         menu.exec_(self.mapToGlobal(event.pos()))
-        # cmenu = QMenu(self)
-        # newAct = cmenu.addAction("New")
-        # openAct = cmenu.addAction("Open")
-        # quitAct = cmenu.addAction("Quit")
-        # action = cmenu.exec_(self.mapToGlobal(event.pos()))
         
         
 

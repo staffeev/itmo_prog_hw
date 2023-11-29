@@ -15,8 +15,7 @@ class Category(SqlAlchemyBase):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False, unique=True)
     color = Column(String, nullable=False, default=get_random_color)
-    products = relation("Product", secondary="product_to_category", 
-                        back_populates="categories", cascade="all, delete")
+    products = relation("Product", back_populates="category")
 
 
     @validates("name")

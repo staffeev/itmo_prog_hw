@@ -19,9 +19,8 @@ class Product(SqlAlchemyBase):
     name = Column(String, nullable=False)
     date = Column(DateTime, default=datetime.datetime.now)
     cost = Column(Float, nullable=False)
-    is_usd = Column(Boolean, default=False)
-    categories = relation("Category", secondary="product_to_category", 
-                          back_populates="products")
+    category_id = Column(Integer, ForeignKey("category.id"))
+    category = relation("Category", back_populates="products", cascade="all, delete")
 
     @validates("name")
     def validate_name(self, _, value):
