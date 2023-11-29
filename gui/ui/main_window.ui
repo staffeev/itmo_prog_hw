@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>541</width>
+    <width>574</width>
     <height>552</height>
    </rect>
   </property>
@@ -82,7 +82,11 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QComboBox" name="period_combobox"/>
+       <widget class="QComboBox" name="category_combobox">
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label_2">
@@ -92,7 +96,43 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QComboBox" name="category_combobox"/>
+       <widget class="QComboBox" name="period_combobox">
+        <item>
+         <property name="text">
+          <string/>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>День</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Неделя</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Месяц</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Год</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Выбрать</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string/>
+         </property>
+        </item>
+       </widget>
       </item>
       <item row="1" column="3">
        <widget class="QPushButton" name="reset_btn">
@@ -111,7 +151,12 @@
        <widget class="QComboBox" name="sorting_combobox">
         <item>
          <property name="text">
-          <string>По дате</string>
+          <string>По убыванию даты</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>По возрастанию даты</string>
          </property>
         </item>
         <item>
@@ -129,7 +174,31 @@
      </layout>
     </item>
     <item row="3" column="0">
-     <widget class="QTableWidget" name="purchase_list"/>
+     <widget class="QTableWidget" name="purchase_list">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <column>
+       <property name="text">
+        <string>Дата</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Наименование</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Стоимость</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Категория</string>
+       </property>
+      </column>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -138,7 +207,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>541</width>
+     <width>574</width>
      <height>22</height>
     </rect>
    </property>

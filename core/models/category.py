@@ -23,7 +23,7 @@ class Category(SqlAlchemyBase):
         return f"Category(name={self.name})"
     
     def __str__(self):
-        return repr(self)
+        return self.name
 
 
 

@@ -17,7 +17,7 @@ class Product(SqlAlchemyBase):
     __tablename__ = "product"
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
-    date = Column(Date, default=datetime.datetime.now)
+    date = Column(DateTime, default=datetime.datetime.now)
     cost = Column(Float, nullable=False)
     is_usd = Column(Boolean, default=False)
     categories = relation("Category", secondary="product_to_category", 
@@ -37,14 +37,14 @@ class Product(SqlAlchemyBase):
             raise ValueError("Cost must be positive float")
         if value > 9223372036854775807:
             raise ValueError("")
-        if not 0 < value < 9223372036854775807:
+        if not 0 <= value < 9223372036854775807:
             raise ValueError("Cost can't be so enormous")
         return value
     
 
     def __repr__(self):
-        return f"Product(name={self.name}, cost={self.cost})"
+        return f"Product(name={self.name}, cost={self.cost}, date={self.date})"
     
 
     def __str__(self):
-        return repr(self)
+        return self.name

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>524</width>
+    <width>259</width>
     <height>226</height>
    </rect>
   </property>
@@ -18,8 +18,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>521</width>
-     <height>221</height>
+     <width>224</width>
+     <height>232</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
@@ -35,18 +35,8 @@
     <property name="bottomMargin">
      <number>15</number>
     </property>
-    <property name="horizontalSpacing">
-     <number>6</number>
-    </property>
     <item row="0" column="0">
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Введите название товара</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <widget class="QLineEdit" name="product_name">
         <property name="maxLength">
@@ -61,10 +51,27 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QDoubleSpinBox" name="cost_spinbox">
-        <property name="maximum">
-         <double>9223372036854775808.000000000000000</double>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Введите название товара</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Выберите или создайте категорию</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QComboBox" name="category_choice">
+        <property name="toolTip">
+         <string>Если вы в поиске введете категорию, которой еще нет, то она добавится в список всех существующих</string>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -89,33 +96,33 @@
         </item>
        </layout>
       </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Выберите или создайте категорию</string>
+      <item row="3" column="0">
+       <widget class="QDoubleSpinBox" name="cost_spinbox">
+        <property name="maximum">
+         <double>9223372036854775808.000000000000000</double>
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
-       <widget class="QComboBox" name="category_choice">
-        <property name="toolTip">
-         <string>Если вы в поиске введете категорию, которой еще нет, то она добавится в список всех существующих</string>
-        </property>
-        <property name="editable">
-         <bool>true</bool>
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Выберите время совершения покупки</string>
         </property>
        </widget>
       </item>
      </layout>
     </item>
-    <item row="0" column="1">
-     <widget class="QCalendarWidget" name="calendar">
+    <item row="1" column="0">
+     <widget class="QDateTimeEdit" name="calendar">
       <property name="minimumDate">
        <date>
-        <year>1900</year>
+        <year>1896</year>
         <month>1</month>
         <day>1</day>
        </date>
+      </property>
+      <property name="calendarPopup">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
