@@ -8,7 +8,7 @@ from PyQt5 import QtCore
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QColor
 from gui.form_add_purchase import AddForm
-from gui.checkable_combobox import ComboBoxWithCheckBoxes
+from gui.choose_period_form import ChoosePeriodForm
 from db.db_control_functions import get_categories, get_products, add_category, \
     get_category_by_name, add_purchase, delete_purcahses, change_purchase
 import qdarktheme
@@ -66,11 +66,24 @@ class MoneyControlApp(QMainWindow):
     def get_filtered_purchases_by_period(self, purchases: list):
         """Возвращает покупки с фильтром времени"""
         period = self.period_combobox.currentText()
-        if not period:
+        if not period: # период не установлен
             return purchases
-        current_dt = datetime.now()
-        dif_days = {"День": 1, "Неделя": 7, "Месяц": 31, "Год": 365}[period]
-        return list(filter(lambda x: (current_dt - x.date).days <= dif_days, purchases))
+        if period != "Выбрать": # период из предустановленных
+            current_dt = datetime.now()
+            dif_days = {"День": 1, "Неделя": 7, "Месяц": 31, "Год": 365}[period]
+            return list(filter(lambda x: (current_dt - x.date).days <= dif_days, purchases))
+        # пользователь выбирает период сам
+        form = ChoosePeriodForm()
+        if not form.exec():
+            return purchases
+        start_dt = form.calendar.from_date.toPyDate()
+        if form.calendar.to_date is None:
+            end_dt = datetime.now().date()
+        else:
+            end_dt = form.calendar.to_date.toPyDate()
+        if end_dt < start_dt:
+            start_dt, end_dt = end_dt, start_dt
+        return list(filter(lambda x: start_dt <= x.date.date() <= end_dt, purchases))
     
     def get_filtered_purchases_by_category(self, purchases: list):
         """Возвращает покупки с фильтром категории"""
