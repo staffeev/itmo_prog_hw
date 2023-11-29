@@ -37,6 +37,8 @@ class ComboBoxWithCheckBoxes(QComboBox):
                 for x in range(1, self.count()):
                     it = self.model().item(x, self.modelColumn())
                     it.setCheckState(Qt.Unchecked)
+            else:
+                self.check_item(0, False)
         else:
             item.setCheckState(Qt.Checked)
             if item.text() == "": # поставить отметки у всех категорий
