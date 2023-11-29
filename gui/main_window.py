@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QAbstra
 from PyQt5 import QtCore
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QColor
+from gui.checkable_combobox import ComboBoxWithCheckBoxes
 from gui.form_add_purchase import AddForm
 from gui.choose_period_form import ChoosePeriodForm
 from db.db_control_functions import get_categories, get_products, add_category, \
@@ -30,6 +31,8 @@ class MoneyControlApp(QMainWindow):
         self.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 0px; }")
         db_session.global_init(path_to_db)
         self.session = db_session.create_session()
+        self.category_combobox = ComboBoxWithCheckBoxes()
+        self.gridLayout_2.addWidget(self.category_combobox, 3, 1, 1, 1)
         # Объявление нужных переменных
         self.all_categories = get_categories(self.session)
         self.all_purchases = get_products(self.session)
@@ -97,6 +100,7 @@ class MoneyControlApp(QMainWindow):
         """Загрузка категорий в меню"""
         self.category_combobox.clear()
         self.category_combobox.addItems([""] + sorted(map(str, self.all_categories)))
+        [self.category_combobox.check_item(i) for i in range(self.all_categories.count())]
     
     def update_shown_purchases(self):
         """Обновляет список показываемых покупок"""
