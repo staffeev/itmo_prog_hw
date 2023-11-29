@@ -180,6 +180,12 @@
       <property name="enabled">
        <bool>true</bool>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Можно изменять записи, если нажать ПКМ, когда есть выделенные строки&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="toolTipDuration">
+       <number>-2</number>
+      </property>
       <column>
        <property name="text">
         <string>Дата</string>

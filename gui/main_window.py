@@ -27,6 +27,7 @@ class MoneyControlApp(QMainWindow):
         loadUi("gui/ui/main_window.ui", self)
         self.setCentralWidget(self.centralwidget)
         self.setLayout(self.gridLayout)
+        self.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 0px; }")
         db_session.global_init(path_to_db)
         self.session = db_session.create_session()
         # Объявление нужных переменных

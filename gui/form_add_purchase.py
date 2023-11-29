@@ -8,6 +8,7 @@ class AddForm(QDialog):
     def __init__(self, categories: list[str]):
         super().__init__()
         loadUi("gui/ui/add_purchase_form.ui", self)
+        self.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 0px; }")
         self.setLayout(self.gridLayout)
         self.category_choice.addItems(sorted(map(str, categories)))
         self.category_choice.setInsertPolicy(QComboBox.NoInsert)
