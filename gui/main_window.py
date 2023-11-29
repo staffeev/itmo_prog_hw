@@ -3,12 +3,13 @@ import os
 sys.path.append(os.getcwd())
 from core.models import db_session
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, QAbstractItemView, \
-    QHeaderView, QComboBox
+    QHeaderView, QComboBox, QMenu, QMessageBox
+from PyQt5 import QtCore
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QColor
 from gui.form_add_purchase import AddForm
 from db.db_control_functions import get_categories, get_products, add_category, \
-    get_category_by_name, add_purchase
+    get_category_by_name, add_purchase, delete_purcahses
 import qdarktheme
 from datetime import datetime
 
@@ -40,10 +41,22 @@ class MoneyControlApp(QMainWindow):
         self.period_combobox.currentTextChanged.connect(self.update_shown_purchases)
         self.reset_btn.clicked.connect(self.reset_filters)
         self.category_combobox.setInsertPolicy(QComboBox.NoInsert)
+        # self.purchase_list.currentCellChanged.connect(self.on_table_context_menu)
 
         # Вызов предварительных функций
         self.load_all_categories()
         self.load_all_purchases()
+        self.calculate_total_cost()
+    
+    def reload_all_purchases(self):
+        """Делает повторнйы запрос в бд на получение покупок"""
+        self.all_purchases = get_products(self.session)
+        self.update_shown_purchases()
+    
+    def on_table_context_menu(self):
+        """Обработка вызова контекстного меню из таблицы"""
+        # selected_rows = 
+        print(self.purchase_list.selectionModel().selectedRows())
     
     def reset_filters(self):
         """Сброс фильтров"""
@@ -81,14 +94,20 @@ class MoneyControlApp(QMainWindow):
         """Обновляет список показываемых покупок"""
         self.shown_purchases = self.get_filtered_purchases_by_category(
             self.get_filtered_purchases_by_period(self.all_purchases))
+        self.calculate_total_cost()
         self.load_all_purchases()
+    
+    def calculate_total_cost(self):
+        """Подсчет суммы потраченных средств за период"""
+        value = sum(i.cost for i in self.shown_purchases)
+        self.total_cost.setText(str(value))
     
     def load_all_purchases(self):
         """Загрузка покупок в таблицу"""
-        sorted_purchases = self.get_sorted_purchases()
+        self.shown_purchases = self.get_sorted_purchases()
         self.purchase_list.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)   
-        self.purchase_list.setRowCount(len(sorted_purchases))
-        for i, purchase in enumerate(sorted_purchases):
+        self.purchase_list.setRowCount(len(self.shown_purchases))
+        for i, purchase in enumerate(self.shown_purchases):
             self.purchase_list.setItem(i, 0, QTableWidgetItem(purchase.date.strftime("%d-%m-%Y %H:%M")))
             self.purchase_list.setItem(i, 1, QTableWidgetItem(purchase.name))
             self.purchase_list.setItem(i, 2, QTableWidgetItem(str(purchase.cost)))
@@ -128,10 +147,34 @@ class MoneyControlApp(QMainWindow):
         self.all_purchases.append(purchase)
         self.update_shown_purchases()
     
+    def delete_from_table(self, rows):
+        """Удаление записей из таблицы"""
+        flag = QMessageBox.question(
+                self, "Удаление", "Вы уверены, что хотите удлить выбранные записи?"
+            )
+        if flag != QMessageBox.Yes:
+            return
+        delete_purcahses(self.session, [self.shown_purchases[i].id for i in rows])
+        self.reload_all_purchases()
+    
 
     def closeEvent(self, _):
         """Ивент закрытия окна"""
         self.session.close()
+    
+    def contextMenuEvent(self, event):
+        """Обработка вызова контекстного меню"""
+        selected_rows = self.purchase_list.selectionModel().selectedRows()
+        rows = [i.row() for i in selected_rows]
+        menu = QMenu()
+        if rows:
+            menu.addAction("Удалить записи", lambda: self.delete_from_table(rows))
+        menu.exec_(self.mapToGlobal(event.pos()))
+        # cmenu = QMenu(self)
+        # newAct = cmenu.addAction("New")
+        # openAct = cmenu.addAction("Open")
+        # quitAct = cmenu.addAction("Quit")
+        # action = cmenu.exec_(self.mapToGlobal(event.pos()))
         
         
 

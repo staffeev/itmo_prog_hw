@@ -38,3 +38,9 @@ def add_purchase(session, product_name: str, cost: float, date: dt.date, categor
     session.add(product)
     session.commit()
     return product
+
+
+def delete_purcahses(session, ids: list):
+    """Удаление покупок по id"""
+    session.query(Product).filter(Product.id.in_(ids)).delete()
+    session.commit()
