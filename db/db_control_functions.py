@@ -44,3 +44,13 @@ def delete_purcahses(session, ids: list):
     """Удаление покупок по id"""
     session.query(Product).filter(Product.id.in_(ids)).delete()
     session.commit()
+
+
+def change_purchase(session, id_, product_name: str, cost: float, date: dt.date, category: Category):
+    """Изменение существующей покупки"""
+    product = session.query(Product).filter(Product.id == id_).first()
+    product.name = product_name
+    product.cost = cost
+    product.date = date
+    product.category = category
+    session.commit()

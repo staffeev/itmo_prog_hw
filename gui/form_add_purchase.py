@@ -18,6 +18,14 @@ class AddForm(QDialog):
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
         self.gridLayout.addWidget(self.buttonBox, 2, 0, 1, 1)
+    
+    def set_data(self, purchase):
+        """Установка значений (изменение созданной записи)"""
+        self.product_name.setText(purchase.name)
+        self.cost_spinbox.setValue(purchase.cost)
+        self.category_choice.setCurrentText(purchase.category.name)
+        self.calendar.setDateTime(QDateTime.fromSecsSinceEpoch(int(purchase.date.timestamp())))
+
 
     def get_data(self):
         """Возвращает данные из формы"""
@@ -34,7 +42,7 @@ class AddForm(QDialog):
         if not product_name and not category:
             QMessageBox.critical(self, "Ошибка", "Название товара и категория отсутствуют")
             return
-        elif not product_name:
+        if not product_name:
             QMessageBox.critical(self, "Ошибка", "Название товара отсутствует")
             return
         elif not category:

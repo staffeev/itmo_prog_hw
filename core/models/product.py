@@ -19,7 +19,7 @@ class Product(SqlAlchemyBase):
     name = Column(String, nullable=False)
     date = Column(DateTime, default=datetime.datetime.now)
     cost = Column(Float, nullable=False)
-    category_id = Column(Integer, ForeignKey("category.id"))
+    category_id = Column(Integer, ForeignKey("category.id"), nullable=False)
     category = relation("Category", back_populates="products", cascade="all, delete")
 
     @validates("name")

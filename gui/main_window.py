@@ -8,8 +8,9 @@ from PyQt5 import QtCore
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QColor
 from gui.form_add_purchase import AddForm
+from gui.checkable_combobox import ComboBoxWithCheckBoxes
 from db.db_control_functions import get_categories, get_products, add_category, \
-    get_category_by_name, add_purchase, delete_purcahses
+    get_category_by_name, add_purchase, delete_purcahses, change_purchase
 import qdarktheme
 from datetime import datetime
 
@@ -17,7 +18,6 @@ from datetime import datetime
 def except_hook(cls, exception, traceback):
     """Функция для отлова возможных исключений, вознкающих при работе с Qt"""
     sys.__excepthook__(cls, exception, traceback)
-    # TODO: закрывать энджин
 
 
 class MoneyControlApp(QMainWindow):
@@ -41,7 +41,6 @@ class MoneyControlApp(QMainWindow):
         self.period_combobox.currentTextChanged.connect(self.update_shown_purchases)
         self.reset_btn.clicked.connect(self.reset_filters)
         self.category_combobox.setInsertPolicy(QComboBox.NoInsert)
-        # self.purchase_list.currentCellChanged.connect(self.on_table_context_menu)
 
         # Вызов предварительных функций
         self.load_all_categories()
@@ -52,11 +51,6 @@ class MoneyControlApp(QMainWindow):
         """Делает повторнйы запрос в бд на получение покупок"""
         self.all_purchases = get_products(self.session)
         self.update_shown_purchases()
-    
-    def on_table_context_menu(self):
-        """Обработка вызова контекстного меню из таблицы"""
-        # selected_rows = 
-        print(self.purchase_list.selectionModel().selectedRows())
     
     def reset_filters(self):
         """Сброс фильтров"""
@@ -111,6 +105,8 @@ class MoneyControlApp(QMainWindow):
             self.purchase_list.setItem(i, 0, QTableWidgetItem(purchase.date.strftime("%d-%m-%Y %H:%M")))
             self.purchase_list.setItem(i, 1, QTableWidgetItem(purchase.name))
             self.purchase_list.setItem(i, 2, QTableWidgetItem(str(purchase.cost)))
+            if purchase.category is None:
+                continue
             self.purchase_list.setItem(i, 3, QTableWidgetItem(str(purchase.category)))
             self.purchase_list.item(i, 3).setBackground(QColor(purchase.category.color))
     
@@ -131,9 +127,9 @@ class MoneyControlApp(QMainWindow):
         form = AddForm(self.all_categories)
         if not form.exec():
             return
-        self.process_new_purchase(*form.get_data())
+        self.process_purchase(*form.get_data())
         
-    def process_new_purchase(self, *args):
+    def process_purchase(self, *args, id_to_update=False):
         """Обработка данных о новой покупке"""
         product_name, cost, category_name, date = args
         print(args)
@@ -144,9 +140,14 @@ class MoneyControlApp(QMainWindow):
             self.load_all_categories()
         else:
             category = get_category_by_name(self.session, category_name)
-        purchase = add_purchase(self.session, product_name, cost, date, category)
-        self.all_purchases.append(purchase)
-        self.update_shown_purchases()
+        
+        if id_to_update is None: # новая запись
+            purchase = add_purchase(self.session, product_name, cost, date, category)
+            self.all_purchases.append(purchase)
+            self.update_shown_purchases()
+        else: # измененная запись
+            change_purchase(self.session, id_to_update, product_name, cost, date, category)
+            self.reload_all_purchases()
     
     def delete_from_table(self, rows):
         """Удаление записей из таблицы"""
@@ -157,6 +158,15 @@ class MoneyControlApp(QMainWindow):
             return
         delete_purcahses(self.session, [self.shown_purchases[i].id for i in rows])
         self.reload_all_purchases()
+    
+    def exec_change_table_item(self, row):
+        """Изменение записи в таблице"""
+        purchase = self.shown_purchases[row]
+        form = AddForm(self.all_categories)
+        form.set_data(purchase)
+        if not form.exec():
+            return
+        self.process_purchase(*form.get_data(), id_to_update=purchase.id)
 
     def closeEvent(self, _):
         """Ивент закрытия окна"""
@@ -169,19 +179,15 @@ class MoneyControlApp(QMainWindow):
         menu = QMenu()
         if rows:
             menu.addAction("Удалить записи", lambda: self.delete_from_table(rows))
+        if len(rows) == 1:
+            menu.addAction("Изменить запись", lambda: self.exec_change_table_item(rows[0]))
         menu.exec_(self.mapToGlobal(event.pos()))
-        
-        
-
-
-
 
 
 def run_app(path_to_db: str):
     """Запуск программы"""
     app = QApplication(sys.argv)
     qdarktheme.setup_theme("dark")
-    # app.setStyle('fusion')
     programm = MoneyControlApp(path_to_db)
     programm.show()
     sys.excepthook = except_hook
