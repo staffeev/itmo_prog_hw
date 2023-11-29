@@ -45,7 +45,10 @@ class ComboBoxWithCheckBoxes(QComboBox):
                     it.setCheckState(Qt.Checked)
         self.changed_value = True
 
-    def check_item(self, i):
+    def check_item(self, i, flag=False):
         """Функция для создания отметки у элемента (пустой)"""
         new_item = self.model().item(i, self.modelColumn())
-        new_item.setCheckState(Qt.Unchecked)
+        if not flag:
+            new_item.setCheckState(Qt.Unchecked)
+        else:
+            new_item.setCheckState(Qt.Checked)

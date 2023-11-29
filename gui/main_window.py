@@ -41,7 +41,8 @@ class MoneyControlApp(QMainWindow):
         self.purchase_list.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.btn_add_purchase.clicked.connect(self.exec_add_purchase_form)
         self.sorting_combobox.currentTextChanged.connect(self.load_all_purchases)
-        self.category_combobox.currentTextChanged.connect(self.update_shown_purchases)
+        self.category_combobox.view().pressed.connect(self.update_shown_purchases)
+        # self.category_combobox.currentTextChanged.connect(self.update_shown_purchases)
         self.period_combobox.currentTextChanged.connect(self.update_shown_purchases)
         self.reset_btn.clicked.connect(self.reset_filters)
         self.category_combobox.setInsertPolicy(QComboBox.NoInsert)
@@ -58,9 +59,10 @@ class MoneyControlApp(QMainWindow):
     
     def reset_filters(self):
         """Сброс фильтров"""
+        [self.category_combobox.check_item(i, True) for i in range(self.category_combobox.count())]
         self.period_combobox.setCurrentIndex(0)
-        self.category_combobox.setCurrentIndex(0)
         self.sorting_combobox.setCurrentIndex(0)
+        self.update_shown_purchases()
 
     def filter_by_period(self):
         """Оставляет в таблице покупки по фильтру"""
@@ -81,26 +83,29 @@ class MoneyControlApp(QMainWindow):
         if not form.exec():
             return purchases
         start_dt = form.calendar.from_date.toPyDate()
-        if form.calendar.to_date is None:
-            end_dt = datetime.now().date()
-        else:
-            end_dt = form.calendar.to_date.toPyDate()
+        if form.calendar.to_date is None: # если выбран не промежуток, а один день
+            return list(filter(lambda x: x.date.date() == start_dt, purchases))
+        end_dt = form.calendar.to_date.toPyDate()
         if end_dt < start_dt:
             start_dt, end_dt = end_dt, start_dt
         return list(filter(lambda x: start_dt <= x.date.date() <= end_dt, purchases))
     
     def get_filtered_purchases_by_category(self, purchases: list):
         """Возвращает покупки с фильтром категории"""
-        category_name = self.category_combobox.currentText()
-        if not category_name: # все категории
+        # получим список выделенных категорий
+        if self.category_combobox.is_item_checked(0): # выделены все категории
             return purchases
-        return [i for i in purchases if i.category.name == category_name]
+        categories = {self.category_combobox.itemText(i) for i in 
+                      range(self.category_combobox.count()) if self.category_combobox.is_item_checked(i)}
+        if not categories: # ничего не выделено
+            return []
+        return list(filter(lambda x: x.category.name in categories, purchases))
 
     def load_all_categories(self):
         """Загрузка категорий в меню"""
         self.category_combobox.clear()
         self.category_combobox.addItems([""] + sorted(map(str, self.all_categories)))
-        [self.category_combobox.check_item(i) for i in range(self.all_categories.count())]
+        [self.category_combobox.check_item(i, True) for i in range(self.category_combobox.count())]
     
     def update_shown_purchases(self):
         """Обновляет список показываемых покупок"""
@@ -159,7 +164,7 @@ class MoneyControlApp(QMainWindow):
         else:
             category = get_category_by_name(self.session, category_name)
         
-        if id_to_update is None: # новая запись
+        if not id_to_update: # новая запись
             purchase = add_purchase(self.session, product_name, cost, date, category)
             self.all_purchases.append(purchase)
             self.update_shown_purchases()
