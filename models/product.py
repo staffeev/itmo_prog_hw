@@ -4,14 +4,6 @@ from .db_session import SqlAlchemyBase
 import datetime
 
 
-association_table = Table(
-    'product_to_category',
-    SqlAlchemyBase.metadata,
-    Column('product', Integer, ForeignKey('product.id')),
-    Column('category', Integer, ForeignKey('category.id'))
-)
-
-
 class Product(SqlAlchemyBase):
     """Класс для ORM-модели товара"""
     __tablename__ = "product"
