@@ -11,7 +11,7 @@ from gui.checkable_combobox import ComboBoxWithCheckBoxes
 from gui.form_add_purchase import AddForm
 from gui.choose_period_form import ChoosePeriodForm
 from db.db_control_functions import get_categories, get_products, add_category, \
-    get_category_by_name, add_purchase, delete_purcahses, change_purchase
+    get_category_by_name, add_purchase, delete_purcahses, change_purchase, delete_category_by_name
 import qdarktheme
 from datetime import datetime
 
@@ -53,9 +53,14 @@ class MoneyControlApp(QMainWindow):
         self.calculate_total_cost()
     
     def reload_all_purchases(self):
-        """Делает повторнйы запрос в бд на получение покупок"""
+        """Делает повторный запрос в бд на получение покупок"""
         self.all_purchases = get_products(self.session)
         self.update_shown_purchases()
+
+    def reload_all_categories(self):
+        """Делает повторный запрос в бд на получение категорий"""
+        self.all_categories= get_categories(self.session)
+        self.load_all_categories()
     
     def reset_filters(self):
         """Сброс фильтров"""
@@ -175,7 +180,7 @@ class MoneyControlApp(QMainWindow):
     def delete_from_table(self, rows):
         """Удаление записей из таблицы"""
         flag = QMessageBox.question(
-                self, "Удаление", "Вы уверены, что хотите удлить выбранные записи?"
+                self, "Удаление", "Вы уверены, что хотите удалить выбранные записи?"
             )
         if flag != QMessageBox.Yes:
             return
@@ -191,6 +196,17 @@ class MoneyControlApp(QMainWindow):
             return
         self.process_purchase(*form.get_data(), id_to_update=purchase.id)
 
+    def delete_categories(self, categories_names):
+        """Удаление выбранных категорий"""
+        flag = QMessageBox.question(
+                self, "Удаление", f"Вы уверены, что хотите удалить категории {', '.join(categories_names)}? все продукты с этими категориями будут удалены."
+            )
+        if flag != QMessageBox.Yes:
+            return
+        [delete_category_by_name(self.session, cat) for cat in categories_names]
+        self.reload_all_categories()
+        self.reload_all_purchases()
+
     def closeEvent(self, _):
         """Ивент закрытия окна"""
         self.session.close()
@@ -199,11 +215,14 @@ class MoneyControlApp(QMainWindow):
         """Обработка вызова контекстного меню"""
         selected_rows = self.purchase_list.selectionModel().selectedRows()
         rows = [i.row() for i in selected_rows]
+        selected_categories = {i.data(0) for i in self.purchase_list.selectedItems() if i.column() == 3}
         menu = QMenu()
         if rows:
             menu.addAction("Удалить записи", lambda: self.delete_from_table(rows))
         if len(rows) == 1:
             menu.addAction("Изменить запись", lambda: self.exec_change_table_item(rows[0]))
+        if selected_categories:
+            menu.addAction("Удалить категории", lambda: self.delete_categories(sorted(selected_categories)))
         menu.exec_(self.mapToGlobal(event.pos()))
 
 

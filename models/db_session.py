@@ -1,10 +1,20 @@
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from sqlalchemy.orm import Session
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
 import sqlalchemy.ext.declarative as dec
+from sqlite3 import Connection as SQLite3Connection
 
 SqlAlchemyBase = dec.declarative_base()
 __factory = None
+
+@event.listens_for(Engine, "connect")
+def _set_sqlite_pragma(dbapi_connection, connection_record):
+    if isinstance(dbapi_connection, SQLite3Connection):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON;")
+        cursor.close()
 
 
 def global_init(db_file):

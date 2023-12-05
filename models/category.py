@@ -15,17 +15,21 @@ class Category(SqlAlchemyBase):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False, unique=True)
     color = Column(String, nullable=False, default=get_random_color)
-    products = relation("Product", back_populates="category")
-
+    products = relation(
+        "Product", back_populates="category", 
+        # cascade='all, delete-orphan',
+        passive_deletes=True
+    )
 
     @validates("name")
     def validate_name(self, _, value):
         """Проверка допустимых значений для имени"""
+        if not value:
+            raise ValueError("Name can't be empty")
         if len(value) > 1000:
             raise ValueError("Name length can't be more than 1000 symbols")
         return value
     
-
     def __repr__(self):
         return f"Category(name={self.name})"
     

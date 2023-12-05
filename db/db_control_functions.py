@@ -30,6 +30,13 @@ def get_category_by_name(session, category_name: str) -> Category:
     return category
 
 
+def delete_category_by_name(session, category_name: str):
+    """Удаление категории по имени"""
+    category = session.query(Category).filter(Category.name == category_name).first()
+    session.delete(category)
+    session.commit()
+
+
 def add_purchase(session, product_name: str, cost: float, date: dt.date, category: Category) -> Product:
     """Добавление новой покупки"""
     product = Product(name=product_name, cost=cost, date=date)

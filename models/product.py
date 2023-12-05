@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, String, Table, Float, DateTime, Date, Boolean
+from sqlalchemy import Column, Integer, ForeignKey, String, Float, DateTime
 from sqlalchemy.orm import relation, validates
 from .db_session import SqlAlchemyBase
 import datetime
@@ -11,8 +11,8 @@ class Product(SqlAlchemyBase):
     name = Column(String, nullable=False)
     date = Column(DateTime, default=datetime.datetime.now)
     cost = Column(Float, nullable=False)
-    category_id = Column(Integer, ForeignKey("category.id"), nullable=False)
-    category = relation("Category", back_populates="products", cascade="all, delete")
+    category_id = Column(Integer, ForeignKey("category.id", ondelete='CASCADE'), nullable=False, index=True)
+    category = relation("Category", back_populates="products")
 
     @validates("name")
     def validate_name(self, _, value):
@@ -27,15 +27,13 @@ class Product(SqlAlchemyBase):
         if value < 0:
             raise ValueError("Cost must be positive float")
         if value > 9223372036854775807:
-            raise ValueError("")
-        if not 0 <= value < 9223372036854775807:
             raise ValueError("Cost can't be so enormous")
         return value
     
-
     def __repr__(self):
         return f"Product(name={self.name}, cost={self.cost}, date={self.date})"
     
-
     def __str__(self):
         return self.name
+
+

@@ -49,4 +49,6 @@ class AddForm(QDialog):
         elif not category:
             QMessageBox.critical(self, "Ошибка", "Категоия товара не выбрана")
             return
+        elif len(category) > 1000:
+            QMessageBox.critical(self, "Ошибка", "Слишком длинное название категории")
         self.done(1)
