@@ -6,14 +6,15 @@ from models.category import Category
 import datetime as dt
 
 
-def get_products(session) -> list[Product]:
-    """Возвращает данные о товарах из БД"""
-    return session.query(Product).all()
-
-
 def get_categories(session) -> list[Category]:
     """Возвращает данные о категориях из БД"""
     return session.query(Category).all()
+
+
+def get_category_by_name(session, category_name: str) -> Category:
+    """Получение категории по ее имени"""
+    category = session.query(Category).filter(Category.name == category_name).first()
+    return category
 
 
 def add_category(session, category_name: str) -> Category:
@@ -24,17 +25,16 @@ def add_category(session, category_name: str) -> Category:
     return category
 
 
-def get_category_by_name(session, category_name: str) -> Category:
-    """Получение категории по ее имени"""
-    category = session.query(Category).filter(Category.name == category_name).first()
-    return category
-
-
 def delete_category_by_name(session, category_name: str):
     """Удаление категории по имени"""
     category = session.query(Category).filter(Category.name == category_name).first()
     session.delete(category)
     session.commit()
+
+
+def get_products(session) -> list[Product]:
+    """Возвращает данные о товарах из БД"""
+    return session.query(Product).all()
 
 
 def add_purchase(session, product_name: str, cost: float, date: dt.date, category: Category) -> Product:

@@ -122,7 +122,7 @@ class MoneyControlApp(QMainWindow):
     def calculate_total_cost(self):
         """Подсчет суммы потраченных средств за период"""
         value = sum(i.cost for i in self.shown_purchases)
-        self.total_cost.setText(str(value))
+        self.total_cost.setText(str(round(value, 2)))
     
     def load_all_purchases(self):
         """Загрузка покупок в таблицу"""
