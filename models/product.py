@@ -24,8 +24,8 @@ class Product(SqlAlchemyBase):
     @validates("cost")
     def validate_cost(self, _, value):
         """Проверка допустимых значений для цены"""
-        if value < 0:
-            raise ValueError("Cost must be positive float")
+        # if value < 0:
+        #     raise ValueError("Cost must be positive float")
         if value > 9223372036854775807:
             raise ValueError("Cost can't be so enormous")
         return value

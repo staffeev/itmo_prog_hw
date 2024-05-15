@@ -32,10 +32,14 @@ def delete_category_by_name(session, category_name: str):
     session.commit()
 
 
-def get_products(session) -> list[Product]:
+def get_products(session, cost=1) -> list[Product]:
     """Возвращает данные о товарах из БД"""
-    return session.query(Product).all()
-
+    if cost is None:
+        return session.query(Product).all()
+    if cost == 1:
+        return session.query(Product).filter(Product.cost >= 0)
+    if cost == -1:
+        return session.query(Product).filter(Product.cost < 0)
 
 def add_purchase(session, product_name: str, cost: float, date: dt.date, category: Category) -> Product:
     """Добавление новой покупки"""

@@ -1,15 +1,19 @@
 from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QMessageBox, QComboBox
 from PyQt5.QtCore import QDateTime
 from PyQt5.uic import loadUi
+import os
 
 
 class AddForm(QDialog):
     """Класс формы для добавления покупки"""
-    def __init__(self, categories: list[str]):
+    def __init__(self, categories: list[str], ui_file="add_purchase_form.ui", max_cost=10**9):
         super().__init__()
-        loadUi("gui/ui/add_purchase_form.ui", self)
+        # loadUi(os.path.join(os.path.dirname(__file__), "ui", ui_file))
+        print(ui_file)
+        loadUi(f"gui/ui/{ui_file}", self)
         self.setStyleSheet("QToolTip { color: #ffffff; background-color: #000000; border: 0px; }")
         self.setLayout(self.gridLayout)
+        self.cost_spinbox.setMaximum(max_cost)
         self.category_choice.addItems(sorted(map(str, categories)))
         self.category_choice.setInsertPolicy(QComboBox.NoInsert)
         self.calendar.setDateTime(QDateTime.currentDateTime())

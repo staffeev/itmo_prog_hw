@@ -40,6 +40,7 @@ class MoneyControlApp(QMainWindow):
         # Настройка сигналов и слотов
         self.purchase_list.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.btn_add_purchase.clicked.connect(self.exec_add_purchase_form)
+        self.btn_add_balance.clicked.connect(lambda: self.exec_add_purchase_form(True))
         self.sorting_combobox.currentTextChanged.connect(self.load_all_purchases)
         self.category_combobox.view().pressed.connect(self.update_shown_purchases)
         # self.category_combobox.currentTextChanged.connect(self.update_shown_purchases)
@@ -51,6 +52,24 @@ class MoneyControlApp(QMainWindow):
         self.load_all_categories()
         self.load_all_purchases()
         self.calculate_total_cost()
+        self.update_balance()
+    
+    def get_month_refill(self):
+        """Получение месячной выплаты"""
+        day = datetime.now().day
+        if day != 15:
+            return
+        add_purchase(self.session, "Начисление зарплаты", -30000, datetime.now(), "Зарплата")
+    
+    def get_balance(self):
+        """Возвращает баланс кошелька"""
+        cash_receipts = get_products(self.session, -1)
+        balance = sum([-i.cost for i in cash_receipts]) - sum([i.cost for i in self.all_purchases])
+        return balance
+    
+    def update_balance(self):
+        """Выводит баланс кошелька"""
+        self.balance.setText(str(round(self.get_balance(), 2)))
     
     def reload_all_purchases(self):
         """Делает повторный запрос в бд на получение покупок"""
@@ -117,6 +136,7 @@ class MoneyControlApp(QMainWindow):
         self.shown_purchases = self.get_filtered_purchases_by_category(
             self.get_filtered_purchases_by_period(self.all_purchases))
         self.calculate_total_cost()
+        self.update_balance()
         self.load_all_purchases()
     
     def calculate_total_cost(self):
@@ -150,28 +170,37 @@ class MoneyControlApp(QMainWindow):
         elif sorting_method == "По возрастанию цены":
             return sorted(self.shown_purchases, key=lambda x: x.cost)
     
-    def exec_add_purchase_form(self, _):
+    def exec_add_purchase_form(self, negative_cost=False):
         """Метод для работы с формой добавления покупки"""
-        form = AddForm(self.all_categories)
+        if not negative_cost:
+            form = AddForm(self.all_categories, max_cost=self.get_balance())
+        else:
+            cats = [i for i in self.all_categories if all(x.cost < 0 for x in i.products)]
+            form = AddForm(cats, "add_balance_form.ui")
         if not form.exec():
             return
-        self.process_purchase(*form.get_data())
+        self.process_purchase(*form.get_data(), negative_cost=negative_cost)
         
-    def process_purchase(self, *args, id_to_update=False):
+    def process_purchase(self, *args, id_to_update=False, negative_cost=False):
+        print(negative_cost)
         """Обработка данных о новой покупке"""
         product_name, cost, category_name, date = args
+        cost = -cost if negative_cost else cost
         print(args)
         date = date.toPyDateTime()
         if category_name not in list(map(str, self.all_categories)): # новая категория
             category = add_category(self.session, category_name)
-            self.all_categories.append(category_name)
-            self.load_all_categories()
+            self.reload_all_categories()
+            # self.all_categories.append(category_name)
+            # self.load_all_categories()
         else:
             category = get_category_by_name(self.session, category_name)
         
         if not id_to_update: # новая запись
-            purchase = add_purchase(self.session, product_name, cost, date, category)
-            self.all_purchases.append(purchase)
+            add_purchase(self.session, product_name, cost, date, category)
+            self.reload_all_purchases()
+            # print(self.all_purchases)
+            # self.all_purchases.append(purchase)
             self.update_shown_purchases()
         else: # измененная запись
             change_purchase(self.session, id_to_update, product_name, cost, date, category)
