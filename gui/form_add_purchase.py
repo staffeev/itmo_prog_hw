@@ -6,7 +6,7 @@ import os
 
 class AddForm(QDialog):
     """Класс формы для добавления покупки"""
-    def __init__(self, categories: list[str], ui_file="add_purchase_form.ui", max_cost=10**9):
+    def __init__(self, categories: list[str], ui_file="add_purchase_form.ui", max_cost=10**6):
         super().__init__()
         # loadUi(os.path.join(os.path.dirname(__file__), "ui", ui_file))
         print(ui_file)

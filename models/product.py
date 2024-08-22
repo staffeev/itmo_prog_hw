@@ -26,7 +26,7 @@ class Product(SqlAlchemyBase):
         """Проверка допустимых значений для цены"""
         # if value < 0:
         #     raise ValueError("Cost must be positive float")
-        if value > 9223372036854775807:
+        if value > 10 ** 9:
             raise ValueError("Cost can't be so enormous")
         return value
     
